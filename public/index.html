@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ModSecurity Demo</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --surface: #111827;
+      --surface-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #374151;
+      --allow: #22c55e;
+      --block: #ef4444;
+      --focus: #38bdf8;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-4);
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    h1, h2, h3 { margin: 0 0 var(--space-3); }
+    p { margin: 0 0 var(--space-3); }
+
+    .stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 13px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .two-col { grid-template-columns: 1fr; }
+
+    @media (min-width: 900px) {
+      .two-col { grid-template-columns: 1fr 1fr; }
+    }
+
+    label {
+      display: block;
+      margin-bottom: var(--space-1);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font: inherit;
+      font-size: 14px;
+      background: #0f172a;
+      color: var(--text);
+    }
+
+    textarea { min-height: 96px; resize: vertical; }
+
+    button { cursor: pointer; }
+    button:hover { filter: brightness(1.1); }
+
+    button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+
+    .status-pill {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 1px solid;
+      padding: 4px 10px;
+      margin-bottom: var(--space-2);
+    }
+
+    .status-allow { color: var(--allow); border-color: var(--allow); background: rgba(34, 197, 94, 0.1); }
+    .status-block { color: var(--block); border-color: var(--block); background: rgba(239, 68, 68, 0.1); }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .list li { margin-bottom: var(--space-2); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="panel">
+      <h1>Nginx + Node.js + ModSecurity + OWASP CRS Demo</h1>
+      <p>Send requests through protected ingress and inspect WAF decisions in real-time.</p>
+      <p class="muted">Local product demo. Use only safe, non-destructive payloads.</p>
+      <div class="stack">
+        <span class="chip">Client</span>
+        <span class="chip">Nginx</span>
+        <span class="chip">ModSecurity</span>
+        <span class="chip">OWASP CRS</span>
+        <span class="chip">Node.js API</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Live request tester</h2>
+      <label for="endpoint">Endpoint</label>
+      <input id="endpoint" type="text" value="/api/search" />
+
+      <label for="payload">Payload</label>
+      <textarea id="payload">q=normal-search</textarea>
+
+      <div style="margin-top: 12px;">
+        <button id="sendBtn" type="button">Send request</button>
+      </div>
+    </section>
+
+    <section class="grid two-col">
+      <section class="panel">
+        <h2>Request / response timeline</h2>
+        <ol id="timeline" class="list mono" aria-live="polite">
+          <li>Idle. Submit a request to see live flow.</li>
+        </ol>
+      </section>
+
+      <section class="panel">
+        <h2>WAF decision</h2>
+        <span id="decisionPill" class="status-pill status-allow">ALLOW</span>
+        <p><strong>Decision:</strong> <span id="decisionText">No blocking signature matched.</span></p>
+        <p><strong>Matched rule IDs:</strong> <span id="ruleIds" class="mono">None</span></p>
+        <p><strong>Request ID:</strong> <span id="requestId" class="mono">-</span></p>
+      </section>
+    </section>
+
+    <section class="panel">
+      <h2>Attack scenario quick actions</h2>
+      <p class="muted">One click fills payload; then click Send request.</p>
+      <div class="actions">
+        <button type="button" data-scenario="sqli">SQLi</button>
+        <button type="button" data-scenario="xss">XSS</button>
+        <button type="button" data-scenario="lfi">LFI</button>
+        <button type="button" data-scenario="path">Path traversal</button>
+      </div>
+    </section>
+
+    <section class="grid two-col">
+      <section class="panel">
+        <h3>Audit log preview</h3>
+        <ul id="auditLogs" class="list mono" aria-live="polite">
+          <li>[audit] waiting for first request...</li>
+        </ul>
+      </section>
+      <section class="panel">
+        <h3>Access log preview</h3>
+        <ul id="accessLogs" class="list mono" aria-live="polite">
+          <li>[access] waiting for first request...</li>
+        </ul>
+      </section>
+    </section>
+
+    <footer class="panel">
+      <h2>Next steps</h2>
+      <ul class="list">
+        <li>Use DetectionOnly mode for tuning before strict blocking.</li>
+        <li>Add path-specific exclusions only after confirming false positives.</li>
+        <li>Run security smoke tests after every config change.</li>
+      </ul>
+    </footer>
+  </main>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

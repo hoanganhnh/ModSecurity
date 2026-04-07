@@ -1,0 +1,35 @@
+services:
+  demo-app:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run start"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      APP_PORT: ${APP_PORT:-3000}
+    volumes:
+      - ./:/app
+    expose:
+      - "3000"
+
+  waf-gateway:
+    image: owasp/modsecurity-crs:4.25-nginx-lts
+    depends_on:
+      - demo-app
+    environment:
+      BACKEND: ${BACKEND:-http://demo-app:3000}
+      SERVERNAME: localhost
+      PORT: 8080
+      PROXY_TIMEOUT: ${PROXY_TIMEOUT:-30s}
+      PARANOIA: ${PARANOIA:-1}
+      BLOCKING_PARANOIA: ${BLOCKING_PARANOIA:-1}
+      ANOMALY_INBOUND: ${ANOMALY_INBOUND:-5}
+      ANOMALY_OUTBOUND: ${ANOMALY_OUTBOUND:-4}
+      REPORTING_LEVEL: ${REPORTING_LEVEL:-2}
+      MODSEC_RULE_ENGINE: ${MODSEC_RULE_ENGINE:-On}
+      MANUAL_MODE: ${MANUAL_MODE:-0}
+    ports:
+      - "${DEMO_PORT:-8080}:8080"
+    volumes:
+      - ./nginx/conf.d/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template:ro
+      - ./modsecurity/custom/request-900-exclusion-rules-before-crs.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
+      - ./modsecurity/custom/response-999-exclusion-rules-after-crs.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
