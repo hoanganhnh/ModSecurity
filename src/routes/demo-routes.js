@@ -1,9 +1,10 @@
 const express = require('express');
-const { healthHandler, searchHandler } = require('../controllers/demo-controller');
+const { healthHandler } = require('../controllers/demo-controller');
+const { getSecurityStatsHandler } = require('../controllers/stats-controller');
 
 const router = express.Router();
 
 router.get('/health', healthHandler);
-router.post('/api/search', searchHandler);
+router.get('/api/stats/security', getSecurityStatsHandler);
 
 module.exports = { demoRoutes: router };

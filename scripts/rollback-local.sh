@@ -16,8 +16,13 @@ case "$MODE" in
     MODSEC_RULE_ENGINE=DetectionOnly docker compose up -d --build
     echo "stack started in detection-only mode"
     ;;
+  blocking)
+    docker compose down --remove-orphans
+    MODSEC_RULE_ENGINE=On docker compose up -d --build
+    echo "stack started in blocking mode"
+    ;;
   *)
-    echo "usage: scripts/rollback-local.sh [reset|detection-only]"
+    echo "usage: scripts/rollback-local.sh [reset|detection-only|blocking]"
     exit 1
     ;;
 esac

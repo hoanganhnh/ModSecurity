@@ -5,7 +5,12 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
 ## Stack
 - `demo-app`: Node.js (Express) API + static UI
 - `waf-gateway`: `owasp/modsecurity-crs:4.25-nginx-lts`
-- Flow: Browser -> Nginx + ModSecurity + CRS -> Node API
+- `postgres`: backing store for the demo API
+- `elasticsearch`: stores gateway/app observability events
+- `kibana`: operator view for log search and trace correlation
+- `filebeat`: ships app, Nginx, and ModSecurity logs into Elasticsearch
+- Flow: Browser -> Nginx + ModSecurity + CRS -> Node API -> PostgreSQL
+- Observability: `waf-gateway` + `demo-app` -> Filebeat -> Elasticsearch -> Kibana
 
 ## Prerequisites
 - Docker + Docker Compose v2
@@ -25,7 +30,9 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
 3. Open demo UI:
    - `http://localhost:8080`
    - Or `http://localhost:${DEMO_PORT}` if set in `.env`
-4. Health check:
+4. Open Kibana:
+   - `http://localhost:5601/app/discover`
+5. Health check:
    ```bash
    curl -i "http://localhost:${DEMO_PORT:-8080}/health"
    ```
@@ -36,11 +43,15 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
    - Keep `MANUAL_MODE=0` for blocking behavior by default.
 2. **Boot services**
    - Run `docker compose up -d --build`.
-   - Wait until gateway/app are ready.
+   - Wait until gateway/app/ELK are ready.
 3. **Run demo scenario**
    - Submit a normal payload from UI (expect allow).
    - Submit attack-like payload from UI quick actions (expect block).
-4. **Validate behavior from CLI**
+   - Confirm the UI shows the ELK/Kibana hint and request ID.
+4. **Inspect observability**
+   - Open `http://localhost:5601/app/discover`.
+   - Search `requestId` from the UI response to correlate app and gateway logs.
+5. **Validate behavior from CLI**
    ```bash
    npm run smoke
    ```
@@ -71,6 +82,9 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
 ## Useful Endpoints
 - Health: `GET /health`
 - Demo API: `POST /api/search`
+- Stats API: `GET /api/stats/security`
+- Kibana Discover: `http://localhost:5601/app/discover`
+- Elasticsearch: `http://localhost:9200`
 
 ## Project Scripts
 - `npm run start` - start app (container command)
@@ -78,6 +92,13 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
 - `npm test` - e2e/security specs
 - `npm run smoke` - gateway allow/block smoke test
 - `npm run rollback -- <mode>` - reset or detection-only
+
+## Observability Notes
+- ELK is started by default with `docker compose up -d --build`.
+- App logs are written to `logs/demo-app/application.log` and mirrored to stdout.
+- Gateway logs are written under `logs/nginx/` and ModSecurity audit logs under `logs/modsecurity/`.
+- Filebeat ingests those files into Elasticsearch index pattern `modsecurity-demo-*`.
+- Request correlation depends on shared `requestId` propagation between gateway and app using `ELK_PROXY_TOKEN`.
 
 ## Documentation
 - Deployment: [`docs/deployment-guide.md`](./docs/deployment-guide.md)

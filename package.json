@@ -2,16 +2,18 @@
   "name": "modsecurity",
   "version": "1.0.0",
   "private": true,
-  "description": "Local Nginx + Node.js + ModSecurity + OWASP CRS demo",
+  "description": "Local Nginx + Node.js + ModSecurity + OWASP CRS",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "lint": "node --check src/server.js && node --check src/controllers/demo-controller.js && node --check src/routes/demo-routes.js && node --check src/middleware/request-id-middleware.js && node --check public/app.js",
+    "lint": "node --check src/**/*.js",
     "test": "node --test tests/**/*.spec.js",
+    "test:db": "RUN_DB_INTEGRATION_TESTS=1 node --test tests/integration/postgres-repositories.spec.js",
     "smoke": "bash ./scripts/smoke-test.sh",
     "rollback": "bash ./scripts/rollback-local.sh"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "pg": "^8.16.3"
   }
 }

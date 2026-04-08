@@ -11,6 +11,18 @@
   const auditLogs = document.getElementById('auditLogs');
   const accessLogs = document.getElementById('accessLogs');
 
+  const metricTotal = document.getElementById('metricTotal');
+  const metricBlocked = document.getElementById('metricBlocked');
+  const metricAllowed = document.getElementById('metricAllowed');
+  const metricFiltered = document.getElementById('metricFiltered');
+  const statsEndpointFilter = document.getElementById('statsEndpointFilter');
+  const statsDecisionFilter = document.getElementById('statsDecisionFilter');
+  const topRuleIds = document.getElementById('topRuleIds');
+  const endpointDistribution = document.getElementById('endpointDistribution');
+  const latestEvents = document.getElementById('latestEvents');
+  const elkStatus = document.getElementById('elkStatus');
+  const elkLink = document.getElementById('elkLink');
+
   const scenarios = {
     sqli: "q=' OR 1=1 --",
     xss: 'comment=<script>alert(1)</script>',
@@ -32,6 +44,69 @@
     decisionPill.className = `status-pill ${isBlocked ? 'status-block' : 'status-allow'}`;
     decisionText.textContent = text;
     ruleIds.textContent = ids.length > 0 ? ids.join(', ') : 'None';
+  }
+
+  function renderStats(stats) {
+    metricTotal.textContent = String(stats.totals.totalRequests);
+    metricBlocked.textContent = String(stats.totals.blockedRequests);
+    metricAllowed.textContent = String(stats.totals.allowedRequests);
+    metricFiltered.textContent = String(stats.filtered.totalEvents);
+    if (elkStatus) {
+      elkStatus.textContent = stats.elk?.enabled ? `ELK enabled · index ${stats.elk.indexPattern}` : 'ELK unavailable';
+    }
+    if (elkLink) {
+      elkLink.hidden = !stats.elk?.dashboardUrl;
+      if (stats.elk?.dashboardUrl) {
+        elkLink.href = stats.elk.dashboardUrl;
+      }
+    }
+
+    renderList(
+      topRuleIds,
+      stats.topRuleIds.length > 0
+        ? stats.topRuleIds.map((entry) => `${entry.ruleId}: ${entry.count}`)
+        : ['No rule matches yet.']
+    );
+
+    renderList(
+      endpointDistribution,
+      stats.endpointDistribution.length > 0
+        ? stats.endpointDistribution.map((entry) => `${entry.endpoint}: ${entry.count}`)
+        : ['No endpoint distribution data yet.']
+    );
+
+    renderList(
+      latestEvents,
+      stats.latestEvents.length > 0
+        ? stats.latestEvents.map((event) => {
+            const rules = event.matchedRuleIds.length > 0 ? event.matchedRuleIds.join(',') : '-';
+            return `${event.timestamp} ${event.decision} ${event.endpoint} rules=${rules}`;
+          })
+        : ['No events yet.']
+    );
+  }
+
+  let statsRequestCounter = 0;
+
+  async function refreshDashboard() {
+    const endpoint = statsEndpointFilter.value;
+    const decision = statsDecisionFilter.value;
+    const query = new URLSearchParams({ endpoint, decision });
+    const requestNumber = ++statsRequestCounter;
+
+    try {
+      const response = await fetch(`/api/stats/security?${query.toString()}`);
+      if (!response.ok || requestNumber !== statsRequestCounter) {
+        return;
+      }
+      const stats = await response.json();
+      if (requestNumber !== statsRequestCounter) {
+        return;
+      }
+      renderStats(stats);
+    } catch (_error) {
+      // no-op; keep last successful dashboard state
+    }
   }
 
   async function sendRequest() {
@@ -102,4 +177,9 @@
   });
 
   sendBtn.addEventListener('click', sendRequest);
+  statsEndpointFilter.addEventListener('change', refreshDashboard);
+  statsDecisionFilter.addEventListener('change', refreshDashboard);
+
+  refreshDashboard();
+  setInterval(refreshDashboard, 2000);
 })();

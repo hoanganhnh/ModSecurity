@@ -140,6 +140,63 @@
     }
 
     .list li { margin-bottom: var(--space-2); }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-2);
+    }
+
+    @media (min-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .metric-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: var(--space-3);
+      background: #0f172a;
+    }
+
+    .metric-label {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metric-value {
+      margin: 6px 0 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .inline-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: end;
+      margin-bottom: var(--space-3);
+    }
+
+    .inline-filters .field {
+      min-width: 160px;
+      flex: 1;
+    }
+
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font: inherit;
+      font-size: 14px;
+      background: #0f172a;
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
@@ -196,6 +253,75 @@
         <button type="button" data-scenario="lfi">LFI</button>
         <button type="button" data-scenario="path">Path traversal</button>
       </div>
+    </section>
+
+    <section class="panel">
+      <h2>Attack observability dashboard</h2>
+      <div class="dashboard-grid">
+        <article class="metric-card">
+          <p class="metric-label">Total requests</p>
+          <p id="metricTotal" class="metric-value">0</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Blocked</p>
+          <p id="metricBlocked" class="metric-value">0</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Allowed</p>
+          <p id="metricAllowed" class="metric-value">0</p>
+        </article>
+        <article class="metric-card">
+          <p class="metric-label">Filtered events</p>
+          <p id="metricFiltered" class="metric-value">0</p>
+        </article>
+      </div>
+
+      <div class="inline-filters">
+        <div class="field">
+          <label for="statsEndpointFilter">Endpoint filter</label>
+          <select id="statsEndpointFilter">
+            <option value="all">All endpoints</option>
+            <option value="/api/login">/api/login</option>
+            <option value="/api/search">/api/search</option>
+            <option value="/api/comment">/api/comment</option>
+            <option value="/api/files">/api/files</option>
+            <option value="/api/admin">/api/admin</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="statsDecisionFilter">Decision filter</label>
+          <select id="statsDecisionFilter">
+            <option value="all">All decisions</option>
+            <option value="BLOCK">BLOCK</option>
+            <option value="ALLOW">ALLOW</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid two-col">
+        <section>
+          <h3>Top rule IDs</h3>
+          <ul id="topRuleIds" class="list mono">
+            <li>No data yet.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Endpoint distribution</h3>
+          <ul id="endpointDistribution" class="list mono">
+            <li>No data yet.</li>
+          </ul>
+        </section>
+      </div>
+
+      <section>
+        <h3>Latest security events</h3>
+        <p id="elkStatus" class="muted">ELK enabled · index modsecurity-demo-*</p>
+        <p><a id="elkLink" class="muted" href="http://localhost:5601/app/discover" target="_blank" rel="noreferrer">Open Kibana Discover</a></p>
+        <ul id="latestEvents" class="list mono">
+          <li>No events yet.</li>
+        </ul>
+      </section>
     </section>
 
     <section class="grid two-col">

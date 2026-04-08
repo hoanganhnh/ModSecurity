@@ -18,8 +18,17 @@ Copy `.env.example` to `.env` to override the defaults shown in `docker-compose.
 | `BACKEND` | `http://demo-app:3000` | Internal target for Nginx proxying. |
 | `MANUAL_MODE` | `0` | Ensures ModSecurity blocks detected threats by default. Set to `1` for manual phase testing, or start detection-only with `scripts/rollback-local.sh detection-only` (sets `MODSEC_RULE_ENGINE=DetectionOnly`). |
 | `MODSEC_RULE_ENGINE`, `PARANOIA`, `BLOCKING_PARANOIA`, `ANOMALY_*`, `REPORTING_LEVEL` | See `docker-compose.yml` | Tuned for CRS baseline behavior. |
+| `ELK_ENABLED` | `1` | Enables the ingest pipeline that forwards gateway/app logs to Elasticsearch. |
+| `ELK_PROXY_TOKEN` | `local-elk-proxy-token` | Secret token both the gateway and Node.js use to trust forwarded `x-request-id` values. |
+| `ELK_INDEX_PATTERN` | `modsecurity-demo-*` | Filebeat/Elasticsearch index pattern for the demo logs. |
+| `KIBANA_DASHBOARD_URL` | `http://localhost:5601/app/discover` | Kibana URL surfaced in the demo UI when the ELK pipeline is healthy. |
 
 The gateway uses the published `owasp/modsecurity-crs:4.25-nginx-lts` image, mounts `nginx/conf.d/default.conf.template` for routing, and exposes only the configured host port.
+
+## Observability stack
+- `elasticsearch` stores the indexed logs from `filebeat` under `modsecurity-demo-%{+yyyy.MM.dd}` and exposes port `9200` so Kibana and the app stats controller can reach it.
+- `kibana` points at Elasticsearch (`ELASTICSEARCH_HOSTS=http://elasticsearch:9200`) with security disabled so the UI link works without credentials.
+- `filebeat` (runs as root) mounts the shared `./logs` directory and tails `logs/demo-app/*.log`, `logs/nginx/*.log`, and `logs/modsecurity/audit.log` while enriching each event with `service` + `source_type` before sending them to Elasticsearch.
 
 ## Quick start
 1. `cp .env.example .env`

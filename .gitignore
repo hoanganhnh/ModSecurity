@@ -63,6 +63,7 @@ plans/**/*
 screenshots/*
 docs/screenshots/*
 logs.txt
+logs/
 test-ck
 __pycache__
 

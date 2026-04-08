@@ -1,0 +1,70 @@
+filebeat.inputs:
+  - type: filestream
+    id: demo-app-logs
+    enabled: true
+    paths:
+      - /workspace/logs/demo-app/*.log
+    parsers:
+      - ndjson:
+          overwrite_keys: true
+          add_error_key: true
+    fields:
+      serviceName: demo-app
+      source_type: application
+    fields_under_root: true
+
+  - type: filestream
+    id: nginx-access-logs
+    enabled: true
+    paths:
+      - /workspace/logs/nginx/access.log
+    parsers:
+      - ndjson:
+          overwrite_keys: true
+          add_error_key: true
+    fields:
+      serviceName: waf-gateway
+      source_type: access
+    fields_under_root: true
+
+  - type: filestream
+    id: nginx-error-logs
+    enabled: true
+    paths:
+      - /workspace/logs/nginx/error.log
+    fields:
+      serviceName: waf-gateway
+      source_type: error
+    fields_under_root: true
+
+  - type: filestream
+    id: modsecurity-audit-logs
+    enabled: true
+    paths:
+      - /workspace/logs/modsecurity/audit.log
+    parsers:
+      - ndjson:
+          overwrite_keys: true
+          add_error_key: true
+    fields:
+      serviceName: waf-gateway
+      source_type: audit
+    fields_under_root: true
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        environment: local-demo
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+
+setup.kibana:
+  host: "http://kibana:5601"
+
+setup.template.name: "modsecurity-demo"
+setup.template.pattern: "modsecurity-demo-*"
+setup.ilm.enabled: false
+
+output.elasticsearch.index: "modsecurity-demo-%{+yyyy.MM.dd}"
