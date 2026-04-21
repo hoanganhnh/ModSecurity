@@ -38,8 +38,8 @@ services:
       KIBANA_DASHBOARD_URL: ${KIBANA_DASHBOARD_URL:-http://localhost:5601/app/discover}
     volumes:
       - ./:/app
-    expose:
-      - "3000"
+    ports:
+      - "${APP_PORT:-3000}:3000"
 
   waf-gateway:
     image: owasp/modsecurity-crs:4.25-nginx-lts
@@ -73,7 +73,7 @@ services:
       timeout: 5s
       retries: 12
     volumes:
-      - ./nginx/conf.d/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template:ro
+      - ./nginx/conf.d/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./modsecurity/custom/request-900-exclusion-rules-before-crs.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
       - ./modsecurity/custom/request-910-app-rules.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-910-APP-RULES.conf:ro
       - ./modsecurity/custom/request-920-rate-limit-rules.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-920-RATE-LIMIT-RULES.conf:ro

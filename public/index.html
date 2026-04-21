@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,7 +24,10 @@
       --radius: 8px;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Inter, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
@@ -46,8 +50,15 @@
       margin-bottom: var(--space-4);
     }
 
-    h1, h2, h3 { margin: 0 0 var(--space-3); }
-    p { margin: 0 0 var(--space-3); }
+    h1,
+    h2,
+    h3 {
+      margin: 0 0 var(--space-3);
+    }
+
+    p {
+      margin: 0 0 var(--space-3);
+    }
 
     .stack {
       display: flex;
@@ -70,10 +81,14 @@
       gap: var(--space-4);
     }
 
-    .two-col { grid-template-columns: 1fr; }
+    .two-col {
+      grid-template-columns: 1fr;
+    }
 
     @media (min-width: 900px) {
-      .two-col { grid-template-columns: 1fr 1fr; }
+      .two-col {
+        grid-template-columns: 1fr 1fr;
+      }
     }
 
     label {
@@ -83,7 +98,9 @@
       font-weight: 600;
     }
 
-    input, textarea, button {
+    input,
+    textarea,
+    button {
       width: 100%;
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -94,12 +111,22 @@
       color: var(--text);
     }
 
-    textarea { min-height: 96px; resize: vertical; }
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
 
-    button { cursor: pointer; }
-    button:hover { filter: brightness(1.1); }
+    button {
+      cursor: pointer;
+    }
 
-    button:focus-visible, input:focus-visible, textarea:focus-visible {
+    button:hover {
+      filter: brightness(1.1);
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
       outline: 2px solid var(--focus);
       outline-offset: 2px;
     }
@@ -121,8 +148,17 @@
       margin-bottom: var(--space-2);
     }
 
-    .status-allow { color: var(--allow); border-color: var(--allow); background: rgba(34, 197, 94, 0.1); }
-    .status-block { color: var(--block); border-color: var(--block); background: rgba(239, 68, 68, 0.1); }
+    .status-allow {
+      color: var(--allow);
+      border-color: var(--allow);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .status-block {
+      color: var(--block);
+      border-color: var(--block);
+      background: rgba(239, 68, 68, 0.1);
+    }
 
     .mono {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -139,7 +175,9 @@
       padding-left: 18px;
     }
 
-    .list li { margin-bottom: var(--space-2); }
+    .list li {
+      margin-bottom: var(--space-2);
+    }
 
     .dashboard-grid {
       display: grid;
@@ -197,8 +235,195 @@
       background: #0f172a;
       color: var(--text);
     }
+
+    .log-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+
+    .log-panel-header h3 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--allow);
+      box-shadow: 0 0 6px var(--allow);
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .live-dot.disconnected {
+      background: var(--muted);
+      box-shadow: none;
+      animation: none;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--allow); }
+      50% { opacity: 0.4; box-shadow: 0 0 2px var(--allow); }
+    }
+
+    /* ── Log section: single column, two equal panels filling the viewport ── */
+    .log-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: var(--space-4);
+      height: calc(100dvh - 56px);
+      min-height: 500px;
+      max-height: calc(100dvh - 56px);
+      margin-bottom: var(--space-4);
+    }
+
+    .log-grid > .panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      margin-bottom: 0;
+      overflow: hidden;
+    }
+
+    .log-terminal {
+      background: #0a0e17;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 transparent;
+    }
+
+    .log-terminal::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .log-terminal::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .log-terminal::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: var(--space-2);
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      animation: log-slide-in 0.3s ease-out;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-entry:hover {
+      background: rgba(30, 41, 59, 0.4);
+    }
+
+    @keyframes log-slide-in {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .log-ts {
+      color: #64748b;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 80px;
+    }
+
+    .log-method {
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 36px;
+    }
+
+    .log-status {
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 28px;
+    }
+
+    .log-status.s2xx { color: var(--allow); }
+    .log-status.s3xx { color: #facc15; }
+    .log-status.s4xx { color: #f97316; }
+    .log-status.s5xx { color: var(--block); }
+
+    .log-uri {
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .log-meta {
+      color: #64748b;
+      margin-left: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .log-rules {
+      color: #f97316;
+      font-weight: 600;
+    }
+
+    .log-action-pass { color: var(--allow); }
+    .log-action-flagged { color: #f97316; }
+
+    .log-empty {
+      padding: 24px 12px;
+      text-align: center;
+      color: #475569;
+      font-style: italic;
+      font-size: 13px;
+    }
+
+    .log-count {
+      font-size: 11px;
+      color: #64748b;
+      background: #1e293b;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .btn-sm {
+      width: auto;
+      padding: 4px 10px;
+      font-size: 11px;
+      border-radius: 4px;
+      background: var(--surface-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-sm:hover {
+      background: #374151;
+      color: var(--text);
+    }
   </style>
 </head>
+
 <body>
   <main class="container">
     <section class="panel">
@@ -216,11 +441,14 @@
 
     <section class="panel">
       <h2>Live request tester</h2>
-      <label for="endpoint">Endpoint</label>
-      <input id="endpoint" type="text" value="/api/search" />
+      <label for="endpointSelect">Endpoint</label>
+      <select id="endpointSelect"></select>
 
-      <label for="payload">Payload</label>
-      <textarea id="payload">q=normal-search</textarea>
+      <label for="methodSelect">HTTP method</label>
+      <select id="methodSelect"></select>
+
+      <p id="requestHint" class="muted">Choose an endpoint to load its supported request shape.</p>
+      <div id="requestFields" class="grid"></div>
 
       <div style="margin-top: 12px;">
         <button id="sendBtn" type="button">Send request</button>
@@ -317,38 +545,45 @@
       <section>
         <h3>Latest security events</h3>
         <p id="elkStatus" class="muted">ELK enabled · index modsecurity-demo-*</p>
-        <p><a id="elkLink" class="muted" href="http://localhost:5601/app/discover" target="_blank" rel="noreferrer">Open Kibana Discover</a></p>
+        <p><a id="elkLink" class="muted" href="http://localhost:5601/app/discover" target="_blank" rel="noreferrer">Open
+            Kibana Discover</a></p>
         <ul id="latestEvents" class="list mono">
           <li>No events yet.</li>
         </ul>
       </section>
     </section>
 
-    <section class="grid two-col">
+    <section class="log-grid">
       <section class="panel">
-        <h3>Audit log preview</h3>
-        <ul id="auditLogs" class="list mono" aria-live="polite">
-          <li>[audit] waiting for first request...</li>
-        </ul>
+        <div class="log-panel-header">
+          <h3>
+            <span class="live-dot" id="auditLiveDot" title="Live"></span>
+            Audit log
+            <span class="log-count" id="auditLogCount">0 entries</span>
+          </h3>
+          <button type="button" class="btn-sm" id="auditClearBtn">Clear</button>
+        </div>
+        <div class="log-terminal" id="auditLogTerminal" aria-live="polite">
+          <div class="log-empty" id="auditLogEmpty">Waiting for ModSecurity audit events…</div>
+        </div>
       </section>
       <section class="panel">
-        <h3>Access log preview</h3>
-        <ul id="accessLogs" class="list mono" aria-live="polite">
-          <li>[access] waiting for first request...</li>
-        </ul>
+        <div class="log-panel-header">
+          <h3>
+            <span class="live-dot" id="accessLiveDot" title="Live"></span>
+            Access log
+            <span class="log-count" id="accessLogCount">0 entries</span>
+          </h3>
+          <button type="button" class="btn-sm" id="accessClearBtn">Clear</button>
+        </div>
+        <div class="log-terminal" id="accessLogTerminal" aria-live="polite">
+          <div class="log-empty" id="accessLogEmpty">Waiting for Nginx access events…</div>
+        </div>
       </section>
     </section>
-
-    <footer class="panel">
-      <h2>Next steps</h2>
-      <ul class="list">
-        <li>Use DetectionOnly mode for tuning before strict blocking.</li>
-        <li>Add path-specific exclusions only after confirming false positives.</li>
-        <li>Run security smoke tests after every config change.</li>
-      </ul>
-    </footer>
   </main>
 
   <script src="/app.js" defer></script>
 </body>
+
 </html>

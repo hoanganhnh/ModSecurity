@@ -15,7 +15,7 @@
 
 ## Security configuration guidelines
 - Always keep OWASP CRS enabled and run with `MANUAL_MODE=0` unless explicitly testing detection-only behavior.
-- Narrow exclusion files (`modsecurity/custom/request-900-exclusion-rules-before-crs.conf`, `modsecurity/custom/response-999-exclusion-rules-after-crs.conf`) remain empty until a documented false positive arises. The new Supabase-specific exclusion prevents cookies named `sb-*-auth-token` (plus optional `.N` suffix) from targeting rule `932260`, stopping false-positive `403` responses on `/` without weakening SQLi blocking on `/api/search`.
+- Narrow exclusion files (`modsecurity/custom/request-900-exclusion-rules-before-crs.conf`, `modsecurity/custom/response-999-exclusion-rules-after-crs.conf`) remain empty until a documented false positive arises. The Supabase-specific exclusion prevents cookies named `sb-*-auth-token` (plus optional `.N` suffix) from targeting rule `932260` on `/`, `/favicon.ico`, and `/api/*`, stopping false-positive `403` responses on browser entry requests without weakening SQLi blocking on `/api/search`.
 - Use `scripts/rollback-local.sh detection-only` to temporarily move to `MODSEC_RULE_ENGINE=DetectionOnly` for tuning before committing exclusions.
 
 ## Testing mandate

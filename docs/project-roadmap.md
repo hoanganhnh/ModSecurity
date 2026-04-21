@@ -9,6 +9,7 @@
 - Phase 06: Validate, test, and harden demo — In progress (focus: lint/test/smoke cycle plus doc accuracy and PDR updates)
 
 ## Current Sprint
+- Completed request tester UI improvement plan `plans/260410-1628-improve-demo-request-tester-ui/`: endpoint/method selector, dynamic request fields, `/api/search` GET default with POST compat, updated e2e/docs, validation passed.
 - Run `npm run lint`, `npm test`, and `bash scripts/smoke-test.sh` to keep the stack healthy and the gateway blocking SQLi-like traffic with `403`.
 - Reconcile the docs (`docs/*.md`) with the running demo (default `MANUAL_MODE=0`, detection-only path via `scripts/rollback-local.sh detection-only`).
 - Capture product development requirements in `docs/project-overview-pdr.md`, system architecture, code standards, and summarize the codebase via `repomix` output.

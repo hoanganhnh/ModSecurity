@@ -28,6 +28,21 @@ test('GET /health returns ok and request-id header', async (t) => {
   assert.ok(response.headers.get('x-request-id'));
 });
 
+test('GET / serves request tester with endpoint and method selectors', async (t) => {
+  const { server, baseUrl } = await startServer();
+  t.after(() => server.close());
+
+  const response = await fetch(`${baseUrl}/`);
+  const html = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(html, /id="endpointSelect"/);
+  assert.match(html, /id="methodSelect"/);
+  assert.match(html, /id="requestFields"/);
+  assert.doesNotMatch(html, /id="endpoint"/);
+  assert.doesNotMatch(html, /id="payload"/);
+});
+
 test('request-id middleware does not trust inbound x-request-id', async (t) => {
   const previousProxyToken = process.env.ELK_PROXY_TOKEN;
   process.env.ELK_PROXY_TOKEN = 'trusted-proxy-token';

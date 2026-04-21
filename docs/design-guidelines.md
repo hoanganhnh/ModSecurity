@@ -49,7 +49,7 @@ Usage rule: keep 1 primary accent (`accent`) + semantic statuses only.
 
 ## 3) Single-page sections (required flow)
 1. Hero: explain Nginx + Node.js + ModSecurity + OWASP CRS pipeline.
-2. Live request tester: endpoint + payload input + send action.
+2. Live request tester: endpoint selector + method selector + generated request fields + send action.
 3. Request/response timeline: ordered events from ingress to app response.
 4. WAF decision panel: allow/block verdict + matched rule IDs.
 5. Attack scenario quick actions: one-click payload presets.
