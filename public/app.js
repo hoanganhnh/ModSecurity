@@ -546,6 +546,15 @@
           'ModSecurity/CRS inspection occurred at gateway',
           `Gateway returned status ${response.status}`
         ]);
+        fetch('/api/stats/gateway-block', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            endpoint: request.endpoint,
+            method: request.method,
+            statusCode: response.status
+          })
+        }).catch(() => {});
         return;
       }
 
@@ -570,6 +579,7 @@
       renderList(timeline, ['Request failed due to network/runtime error']);
     } finally {
       sendBtn.disabled = false;
+      setTimeout(refreshDashboard, 300);
       setTimeout(refreshLogs, 500);
     }
   }

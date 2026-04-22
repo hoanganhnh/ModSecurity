@@ -15,7 +15,7 @@ function createApp() {
   app.use(requestIdMiddleware);
   app.use((req, res, next) => {
     res.on('finish', () => {
-      if (req.path === '/api/stats/security' || req.path === '/api/logs/preview' || req.path.startsWith('/assets/')) {
+      if (req.path === '/api/stats/security' || req.path === '/api/stats/gateway-block' || req.path === '/api/logs/preview' || req.path.startsWith('/assets/')) {
         return;
       }
 
