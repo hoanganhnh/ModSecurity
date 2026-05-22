@@ -104,6 +104,7 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
 - Request correlation depends on shared `requestId` propagation between gateway and app using `ELK_PROXY_TOKEN`.
 
 ## Documentation
+- Presentation Guide: [`docs/modsecurity-presentation-guide.md`](./docs/modsecurity-presentation-guide.md)
 - Deployment: [`docs/deployment-guide.md`](./docs/deployment-guide.md)
 - Architecture: [`docs/system-architecture.md`](./docs/system-architecture.md)
 - Codebase Summary: [`docs/codebase-summary.md`](./docs/codebase-summary.md)

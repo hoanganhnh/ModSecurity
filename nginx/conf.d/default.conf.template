@@ -4,12 +4,15 @@ server {
   listen 8080;
   server_name ${SERVERNAME};
 
+  resolver 127.0.0.11 ipv6=off valid=10s;
+  set $backend "${BACKEND}";
+
   client_max_body_size 64k;
   access_log /var/log/nginx/access.log elk_json;
   error_log /var/log/nginx/error.log warn;
 
   location / {
-    proxy_pass ${BACKEND};
+    proxy_pass $backend;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
