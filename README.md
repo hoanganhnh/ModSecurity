@@ -45,7 +45,10 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
    - Run `docker compose up -d --build`.
    - Wait until gateway/app/ELK are ready.
 3. **Run demo scenario**
-   - Submit a normal payload from UI (expect allow).
+   - Select an endpoint from the UI request tester.
+   - Choose one of the supported HTTP methods for that endpoint.
+   - Fill the generated request fields (body, query, or header inputs depend on the endpoint).
+   - Submit a normal request (expect allow).
    - Submit attack-like payload from UI quick actions (expect block).
    - Confirm the UI shows the ELK/Kibana hint and request ID.
 4. **Inspect observability**
@@ -101,6 +104,7 @@ Local demo stack showing how OWASP CRS (via ModSecurity on Nginx) allows normal 
 - Request correlation depends on shared `requestId` propagation between gateway and app using `ELK_PROXY_TOKEN`.
 
 ## Documentation
+- Presentation Guide: [`docs/modsecurity-presentation-guide.md`](./docs/modsecurity-presentation-guide.md)
 - Deployment: [`docs/deployment-guide.md`](./docs/deployment-guide.md)
 - Architecture: [`docs/system-architecture.md`](./docs/system-architecture.md)
 - Codebase Summary: [`docs/codebase-summary.md`](./docs/codebase-summary.md)

@@ -1,4 +1,4 @@
-const { getSecurityStats } = require('../services/security-events-store');
+const { getSecurityStats, recordSecurityEvent } = require('../services/security-events-store');
 
 const ALLOWED_ENDPOINTS = new Set([
   'all',
@@ -43,6 +43,23 @@ function getSecurityStatsHandler(req, res) {
   });
 }
 
+function reportGatewayBlockHandler(req, res) {
+  const endpoint = typeof req.body.endpoint === 'string' ? req.body.endpoint : '/unknown';
+  const method = typeof req.body.method === 'string' ? req.body.method : 'GET';
+  const statusCode = typeof req.body.statusCode === 'number' ? req.body.statusCode : 403;
+
+  recordSecurityEvent({
+    timestamp: new Date().toISOString(),
+    requestId: req.requestId || null,
+    endpoint,
+    decision: 'BLOCK',
+    matchedRuleIds: ['GATEWAY']
+  });
+
+  return res.status(200).json({ recorded: true });
+}
+
 module.exports = {
-  getSecurityStatsHandler
+  getSecurityStatsHandler,
+  reportGatewayBlockHandler
 };

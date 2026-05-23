@@ -32,7 +32,7 @@
 
 ## WAF configuration notes
 - The gateway mounts `nginx/conf.d/default.conf.template` so the upstream host, proxy timeout, and `X-Request-ID` header stay in sync with the demo backend.
-- CRS exclusions remain empty by default in `modsecurity/custom/request-900-exclusion-rules-before-crs.conf` and `modsecurity/custom/response-999-exclusion-rules-after-crs.conf`; add scoped exclusions only after documenting a false positive. When a false positive occurs (e.g., `GET /` blocked by rule `932260` because of a `sb-*-auth-token` or `sb-*-auth-token.<n>` cookie), the request exclusion file now removes that cookie target from rule `932260`, preventing the Supabase auth cookie from generating a `403` while SQLi blocking stays active for `/api/search`.
+- CRS exclusions remain empty by default in `modsecurity/custom/request-900-exclusion-rules-before-crs.conf` and `modsecurity/custom/response-999-exclusion-rules-after-crs.conf`; add scoped exclusions only after documenting a false positive. When a false positive occurs (e.g., `GET /` or `GET /favicon.ico` blocked by rule `932260` because of a `sb-*-auth-token` or `sb-*-auth-token.<n>` cookie), the request exclusion file now removes that cookie target from rule `932260` for `/`, `/favicon.ico`, and `/api/*`, preventing the Supabase auth cookie from generating a `403` on browser entry requests while SQLi blocking stays active for `/api/search`.
 - `scripts/rollback-local.sh detection-only` restarts the stack with `MODSEC_RULE_ENGINE=DetectionOnly` for tuning before an exclusion is committed.
 
 ## Security boundaries

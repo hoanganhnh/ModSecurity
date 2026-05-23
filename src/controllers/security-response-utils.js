@@ -4,7 +4,7 @@ const { logSecurityDecision } = require('../logging/application-logger');
 const checks = [
   { regex: /\bor\s+1=1\b|--|union\s+select/i, ruleId: '942100', reason: 'SQL injection pattern' },
   { regex: /<script|onerror=|javascript:/i, ruleId: '941100', reason: 'XSS pattern' },
-  { regex: /\.\.\/|etc\/passwd|%2f%2e%2e/i, ruleId: '930120', reason: 'Path traversal/LFI pattern' }
+  { regex: /\.\.\/|\.\.\\|etc\/passwd|%2e%2e%2f|%2e%2e\/|\.\.%2f|%2f%2e%2e|%2e%2e%5c/i, ruleId: '930120', reason: 'Path traversal/LFI pattern' }
 ];
 
 function classifyPayload(payload) {

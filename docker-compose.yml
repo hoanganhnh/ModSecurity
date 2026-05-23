@@ -16,6 +16,16 @@ services:
       timeout: 5s
       retries: 5
 
+  adminer:
+    image: adminer:4-standalone
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    ports:
+      - "${ADMINER_PORT:-8081}:8080"
+
   demo-app:
     image: node:20-alpine
     working_dir: /app
@@ -38,8 +48,8 @@ services:
       KIBANA_DASHBOARD_URL: ${KIBANA_DASHBOARD_URL:-http://localhost:5601/app/discover}
     volumes:
       - ./:/app
-    expose:
-      - "3000"
+    ports:
+      - "${APP_PORT:-3000}:3000"
 
   waf-gateway:
     image: owasp/modsecurity-crs:4.25-nginx-lts
